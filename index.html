@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>인생 피드백 노트</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+  :root{
+    --paper: #eef1ef;
+    --paper-raised: #f8faf8;
+    --ink: #1f2e2b;
+    --ink-soft: #4a5a56;
+    --line: #c9d1cc;
+    --sage: #4d7c62;
+    --sage-deep: #345a46;
+    --amber: #b8863b;
+    --amber-soft: #f3e6cd;
+    --sage-soft: #dfe9e1;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    background-image:
+      linear-gradient(var(--paper) 39px, rgba(77,124,98,0.06) 40px);
+    background-size: 100% 40px;
+    color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height:100vh;
+    padding: 48px 20px 100px;
+  }
+
+  .wrap{
+    max-width: 880px;
+    margin: 0 auto;
+  }
+
+  header{
+    margin-bottom: 36px;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 20px;
+  }
+
+  .eyebrow{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    color: var(--sage-deep);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  h1{
+    font-family: 'Noto Serif KR', serif;
+    font-weight: 700;
+    font-size: 34px;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .sub{
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+
+  .ledger-bar{
+    display:flex;
+    gap: 28px;
+    margin-top: 18px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .ledger-bar .stat{ font-size: 13px; color: var(--ink-soft); }
+  .ledger-bar .stat b{ font-size: 20px; color: var(--ink); display:block; font-family: 'Noto Serif KR', serif; }
+
+  .card{
+    background: var(--paper-raised);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 24px;
+    margin-bottom: 28px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+  }
+
+  .card h2{
+    font-family: 'Noto Serif KR', serif;
+    font-size: 17px;
+    margin: 0 0 16px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .card h2::before{
+    content:"";
+    width: 6px; height: 6px;
+    background: var(--amber);
+    border-radius: 50%;
+    display:inline-block;
+  }
+
+  .form-grid{
+    display:grid;
+    grid-template-columns: 150px 1fr;
+    gap: 14px 16px;
+  }
+
+  label{
+    font-size: 13px;
+    color: var(--ink-soft);
+    align-self: center;
+    font-weight: 500;
+  }
+
+  input[type="date"], textarea{
+    width:100%;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 3px;
+    padding: 9px 11px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    resize: vertical;
+    min-height: 40px;
+  }
+  input[type="date"]{ font-family: 'IBM Plex Mono', monospace; min-height:auto; }
+
+  input:focus, textarea:focus{
+    outline: none;
+    border-color: var(--sage);
+    box-shadow: 0 0 0 3px var(--sage-soft);
+  }
+
+  .form-actions{
+    grid-column: 1 / -1;
+    display:flex;
+    justify-content:flex-end;
+    margin-top: 4px;
+  }
+
+  button.primary{
+    background: var(--sage-deep);
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: background 0.15s ease;
+  }
+  button.primary:hover{ background: var(--ink); }
+  button.primary:focus-visible{ outline: 2px solid var(--sage); outline-offset:2px; }
+
+  table{
+    width:100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  thead th{
+    text-align:left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    border-bottom: 2px solid var(--ink);
+    padding: 0 10px 10px;
+  }
+  th.col-date{ width: 110px; }
+  th.col-cat{ width: 100px; }
+  th.col-status{ width: 90px; }
+  th.col-actions{ width: 40px; }
+
+  tbody tr{ border-bottom: 1px solid var(--line); }
+  tbody tr:hover{ background: rgba(77,124,98,0.05); }
+  td{
+    padding: 14px 10px;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  td.date{
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--ink-soft);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  td.problem{ color: var(--ink); }
+  td.solution{ color: var(--ink); }
+  td.solution.empty{ color: #a3aaa6; font-style: italic; }
+
+  .status-tag{
+    display:inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .status-tag.solved{ background: var(--sage-soft); color: var(--sage-deep); }
+  .status-tag.open{ background: var(--amber-soft); color: var(--amber); }
+
+  .cat-tag{
+    display:inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 3px;
+    font-weight: 500;
+    background: #e4e8e6;
+    color: var(--ink-soft);
+    border: 1px solid var(--line);
+    white-space: nowrap;
+  }
+
+  select{
+    width:100%;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 3px;
+    padding: 9px 11px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  select:focus{
+    outline: none;
+    border-color: var(--sage);
+    box-shadow: 0 0 0 3px var(--sage-soft);
+  }
+
+  .cat-row{
+    display:flex;
+    gap: 8px;
+  }
+  .cat-row select{ flex: 1; }
+  .cat-add-btn{
+    flex-shrink:0;
+    background: #fff;
+    border: 1px solid var(--line);
+    color: var(--sage-deep);
+    border-radius: 3px;
+    padding: 0 14px;
+    font-size: 13px;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .cat-add-btn:hover{ border-color: var(--sage); background: var(--sage-soft); }
+
+  .cat-manage{
+    display:flex;
+    flex-wrap:wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .cat-manage-chip{
+    display:inline-flex;
+    align-items:center;
+    gap: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 4px 6px 4px 10px;
+    border-radius: 20px;
+    background: #e4e8e6;
+    color: var(--ink-soft);
+    border: 1px solid var(--line);
+  }
+  .cat-manage-chip button{
+    background:none; border:none; cursor:pointer;
+    color: #9aa39d; font-size: 13px; line-height:1; padding:2px;
+  }
+  .cat-manage-chip button:hover{ color: #b3452f; }
+
+  .inline-add-row{
+    display:flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .inline-add-row input{
+    flex:1;
+    border: 1px solid var(--sage);
+    border-radius: 3px;
+    padding: 7px 10px;
+    font-size: 13px;
+    font-family:'Noto Sans KR', sans-serif;
+  }
+  .inline-add-row button{
+    background: var(--sage-deep);
+    color:#fff; border:none; border-radius:3px;
+    padding: 0 14px; font-size:13px; cursor:pointer;
+  }
+    display:flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .filter-chip{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 6px 13px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .filter-chip:hover{ border-color: var(--sage); color: var(--sage-deep); }
+  .filter-chip.active{
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+  }
+
+  .del-btn{
+    background:none; border:none; cursor:pointer;
+    color: #b0b6b2; font-size: 16px;
+    padding: 4px;
+    line-height:1;
+    transition: color 0.15s;
+  }
+  .del-btn:hover{ color: #b3452f; }
+
+  .empty-state{
+    text-align:center;
+    padding: 50px 20px;
+    color: var(--ink-soft);
+  }
+  .empty-state .mark{
+    font-family: 'Noto Serif KR', serif;
+    font-size: 22px;
+    color: var(--ink);
+    display:block;
+    margin-bottom: 6px;
+  }
+
+  @media (max-width: 640px){
+    .form-grid{ grid-template-columns: 1fr; }
+    label{ margin-bottom: -6px; }
+    table, thead, tbody, tr, td, th{ display:block; }
+    thead{ display:none; }
+    tbody tr{ padding: 14px 0; }
+    td{ padding: 4px 0; }
+    td.date::before{ content:"날짜 · "; color:var(--ink-soft); }
+    td.cat::before{ content:"카테고리 · "; color:var(--ink-soft); }
+    td.problem::before{ content:"문제 — "; font-weight:600; }
+    td.solution::before{ content:"해결책 — "; font-weight:600; }
+    td.actions{ text-align:right; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Personal Retrospective Log</div>
+    <h1>인생 피드백 노트</h1>
+    <div class="sub">겪은 문제와 그 해결책을 기록해 다음에 참고합니다.</div>
+    <div class="ledger-bar">
+      <div class="stat"><b id="statTotal">0</b>총 기록</div>
+      <div class="stat"><b id="statSolved">0</b>해결됨</div>
+      <div class="stat"><b id="statOpen">0</b>진행중</div>
+    </div>
+  </header>
+
+  <div class="card">
+    <h2>새 기록 추가</h2>
+    <div class="form-grid">
+      <label for="f-date">날짜</label>
+      <input type="date" id="f-date">
+
+      <label for="f-category">카테고리</label>
+      <div>
+        <div class="cat-row">
+          <select id="f-category"></select>
+          <button type="button" class="cat-add-btn" id="showAddCatBtn">+ 새 카테고리</button>
+        </div>
+        <div class="inline-add-row" id="inlineAddRow" style="display:none;">
+          <input type="text" id="newCatInput" placeholder="새 카테고리 이름" maxlength="12">
+          <button type="button" id="confirmAddCatBtn">추가</button>
+        </div>
+        <div class="cat-manage" id="catManage"></div>
+      </div>
+
+      <label for="f-problem">문제</label>
+      <textarea id="f-problem" placeholder="어떤 일이 있었나요?" rows="2"></textarea>
+
+      <label for="f-solution">해결책</label>
+      <textarea id="f-solution" placeholder="어떻게 해결했나요 (또는 해볼 계획인가요)? 비워두면 '진행중'으로 표시됩니다." rows="2"></textarea>
+
+      <div class="form-actions">
+        <button class="primary" id="addBtn">기록 추가</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="tableCard">
+    <h2>기록 목록</h2>
+    <div class="filter-bar" id="filterBar"></div>
+    <table id="entryTable">
+      <thead>
+        <tr>
+          <th class="col-date">날짜</th>
+          <th class="col-cat">카테고리</th>
+          <th>문제</th>
+          <th>해결책</th>
+          <th class="col-status">상태</th>
+          <th class="col-actions"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <span class="mark">아직 기록이 없습니다</span>
+      위 양식에서 첫 기록을 추가해보세요.
+    </div>
+  </div>
+</div>
+
+<script>
+// ⚠️ 배포한 Google Apps Script 웹 앱 URL을 아래에 붙여넣으세요
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwqeXw3c3DylilykJQ9vsps9IFsoZzDXj4vbQLjvWG85uTqsVWUHOtinDHcy_oqAtey/exec';
+
+const DEFAULT_CATEGORIES = ['진료', '투자', '개인', '아웃도어', '기타'];
+let entries = [];
+let categories = [];
+let activeFilter = '전체';
+
+function todayStr(){
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function isConfigured(){
+  return APPS_SCRIPT_URL && APPS_SCRIPT_URL.startsWith('http');
+}
+
+function showConfigWarning(){
+  document.querySelector('.wrap').insertAdjacentHTML('afterbegin',
+    `<div style="background:#f3e6cd;border:1px solid #b8863b;border-radius:4px;padding:16px 20px;margin-bottom:24px;font-size:14px;line-height:1.6;">
+      <b>설정이 필요합니다.</b><br>
+      이 파일의 &lt;script&gt; 맨 위 <code>APPS_SCRIPT_URL</code> 값을 배포한 Google Apps Script 웹 앱 주소로 바꿔주세요.
+    </div>`);
+}
+
+async function apiGet(){
+  const res = await fetch(APPS_SCRIPT_URL);
+  if(!res.ok) throw new Error('불러오기 실패');
+  return res.json();
+}
+
+async function apiPost(payload){
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok) throw new Error('저장 실패');
+  return res.json();
+}
+
+async function loadEntries(){
+  if(!isConfigured()){
+    showConfigWarning();
+    categories = [...DEFAULT_CATEGORIES];
+    entries = [];
+    renderCategorySelect();
+    render();
+    return;
+  }
+  try{
+    const data = await apiGet();
+    entries = data.entries || [];
+    categories = data.categories && data.categories.length ? data.categories : [...DEFAULT_CATEGORIES];
+  }catch(e){
+    console.error(e);
+    alert('데이터를 불러오지 못했습니다. Apps Script URL과 배포 권한(전체 액세스)을 확인해주세요.');
+    entries = [];
+    categories = [...DEFAULT_CATEGORIES];
+  }
+  renderCategorySelect();
+  render();
+}
+
+async function saveEntries(){
+  // 개별 액션(addEntry/deleteEntry)에서 바로 서버에 반영하므로 여기선 사용하지 않음
+}
+
+async function saveCategories(){
+  // 개별 액션(addCategory/deleteCategory)에서 바로 서버에 반영하므로 여기선 사용하지 않음
+}
+
+function renderCategorySelect(){
+  const select = document.getElementById('f-category');
+  const manage = document.getElementById('catManage');
+
+  if(categories.length === 0){
+    select.innerHTML = '<option value="">카테고리를 추가해주세요</option>';
+    select.disabled = true;
+  } else {
+    select.disabled = false;
+    const current = select.value;
+    select.innerHTML = categories.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+    if(categories.includes(current)) select.value = current;
+  }
+
+  manage.innerHTML = categories.map(c =>
+    `<span class="cat-manage-chip">${escapeHtml(c)}<button type="button" data-cat="${escapeHtml(c)}" title="카테고리 삭제">✕</button></span>`
+  ).join('');
+  manage.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => deleteCategory(btn.dataset.cat));
+  });
+}
+
+async function addCategory(name){
+  name = name.trim();
+  if(!name) return;
+  if(categories.includes(name)){
+    alert('이미 있는 카테고리입니다.');
+    return;
+  }
+  categories.push(name);
+  renderCategorySelect();
+  document.getElementById('f-category').value = name;
+  try{
+    await apiPost({ action: 'addCategory', name });
+  }catch(e){
+    alert('카테고리 저장에 실패했습니다. 연결을 확인해주세요.');
+    categories = categories.filter(c => c !== name);
+    renderCategorySelect();
+  }
+}
+
+async function deleteCategory(name){
+  const inUse = entries.some(e => e.category === name);
+  const msg = inUse
+    ? `"${name}" 카테고리를 사용 중인 기록이 있습니다. 목록에서만 제거하고 기존 기록의 표시는 유지됩니다. 삭제할까요?`
+    : `"${name}" 카테고리를 삭제할까요?`;
+  if(!confirm(msg)) return;
+  const backup = [...categories];
+  categories = categories.filter(c => c !== name);
+  if(activeFilter === name) activeFilter = '전체';
+  renderCategorySelect();
+  render();
+  try{
+    await apiPost({ action: 'deleteCategory', name });
+  }catch(e){
+    alert('카테고리 삭제에 실패했습니다. 연결을 확인해주세요.');
+    categories = backup;
+    renderCategorySelect();
+    render();
+  }
+}
+
+function renderFilterBar(){
+  const bar = document.getElementById('filterBar');
+  const entryCats = [...new Set(entries.map(e => e.category).filter(Boolean))];
+  const allCats = [...new Set([...categories, ...entryCats])];
+  const usedCats = ['전체', ...allCats];
+  bar.innerHTML = usedCats.map(c =>
+    `<button class="filter-chip ${c === activeFilter ? 'active' : ''}" data-cat="${c}">${c}</button>`
+  ).join('');
+  bar.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      activeFilter = chip.dataset.cat;
+      render();
+    });
+  });
+}
+
+function render(){
+  const tbody = document.getElementById('tbody');
+  const emptyState = document.getElementById('emptyState');
+  const table = document.getElementById('entryTable');
+
+  renderFilterBar();
+
+  const filtered = activeFilter === '전체' ? entries : entries.filter(e => e.category === activeFilter);
+  const sorted = [...filtered].sort((a,b) => b.date.localeCompare(a.date));
+
+  if(sorted.length === 0){
+    table.style.display = 'none';
+    emptyState.style.display = 'block';
+    emptyState.querySelector('.mark').textContent = entries.length === 0 ? '아직 기록이 없습니다' : '이 카테고리의 기록이 없습니다';
+  } else {
+    table.style.display = '';
+    emptyState.style.display = 'none';
+  }
+
+  tbody.innerHTML = sorted.map(e => {
+    const solved = e.solution && e.solution.trim().length > 0;
+    return `<tr data-id="${e.id}">
+      <td class="date">${e.date}</td>
+      <td class="cat"><span class="cat-tag">${escapeHtml(e.category || '기타')}</span></td>
+      <td class="problem">${escapeHtml(e.problem)}</td>
+      <td class="solution ${solved ? '' : 'empty'}">${solved ? escapeHtml(e.solution) : '아직 없음'}</td>
+      <td><span class="status-tag ${solved ? 'solved' : 'open'}">${solved ? '해결됨' : '진행중'}</span></td>
+      <td class="actions"><button class="del-btn" title="삭제" data-id="${e.id}">✕</button></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('statTotal').textContent = entries.length;
+  document.getElementById('statSolved').textContent = entries.filter(e => e.solution && e.solution.trim()).length;
+  document.getElementById('statOpen').textContent = entries.filter(e => !e.solution || !e.solution.trim()).length;
+
+  tbody.querySelectorAll('.del-btn').forEach(btn => {
+    btn.addEventListener('click', () => removeEntry(btn.dataset.id));
+  });
+}
+
+async function addEntry(){
+  const date = document.getElementById('f-date').value || todayStr();
+  const category = document.getElementById('f-category').value;
+  const problem = document.getElementById('f-problem').value.trim();
+  const solution = document.getElementById('f-solution').value.trim();
+
+  if(!category){
+    alert('카테고리를 먼저 추가하고 선택해주세요.');
+    return;
+  }
+  if(!problem){
+    alert('문제 내용을 입력해주세요.');
+    return;
+  }
+
+  const newEntry = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    date, category, problem, solution
+  };
+  entries.push(newEntry);
+
+  document.getElementById('f-problem').value = '';
+  document.getElementById('f-solution').value = '';
+  document.getElementById('f-date').value = todayStr();
+
+  render();
+
+  const addBtn = document.getElementById('addBtn');
+  addBtn.disabled = true;
+  addBtn.textContent = '저장 중...';
+  try{
+    await apiPost({ action: 'addEntry', entry: newEntry });
+  }catch(e){
+    alert('저장에 실패했습니다. 연결을 확인하고 다시 시도해주세요.');
+    entries = entries.filter(en => en.id !== newEntry.id);
+    render();
+  }finally{
+    addBtn.disabled = false;
+    addBtn.textContent = '기록 추가';
+  }
+}
+
+async function removeEntry(id){
+  const backup = [...entries];
+  entries = entries.filter(e => e.id !== id);
+  render();
+  try{
+    await apiPost({ action: 'deleteEntry', id });
+  }catch(e){
+    alert('삭제에 실패했습니다. 연결을 확인해주세요.');
+    entries = backup;
+    render();
+  }
+}
+
+document.getElementById('f-date').value = todayStr();
+document.getElementById('addBtn').addEventListener('click', addEntry);
+
+const showAddCatBtn = document.getElementById('showAddCatBtn');
+const inlineAddRow = document.getElementById('inlineAddRow');
+const newCatInput = document.getElementById('newCatInput');
+const confirmAddCatBtn = document.getElementById('confirmAddCatBtn');
+
+showAddCatBtn.addEventListener('click', () => {
+  inlineAddRow.style.display = inlineAddRow.style.display === 'none' ? 'flex' : 'none';
+  if(inlineAddRow.style.display === 'flex') newCatInput.focus();
+});
+confirmAddCatBtn.addEventListener('click', async () => {
+  await addCategory(newCatInput.value);
+  newCatInput.value = '';
+  inlineAddRow.style.display = 'none';
+});
+newCatInput.addEventListener('keydown', async (ev) => {
+  if(ev.key === 'Enter'){
+    ev.preventDefault();
+    await addCategory(newCatInput.value);
+    newCatInput.value = '';
+    inlineAddRow.style.display = 'none';
+  }
+});
+
+loadEntries();
+</script>
+</body>
+</html>
